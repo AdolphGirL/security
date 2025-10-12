@@ -6,3 +6,21 @@ server:
 spring:
   application:
     name: SecurityR
+  datasource:
+      url: jdbc:postgresql://localhost:5432/mybatis_demo
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+      type: com.zaxxer.hikari.HikariDataSource
+      hikari:
+          pool-name: MyBatisHikariCP
+          maximum-pool-size: 10
+          minimum-idle: 5
+          idle-timeout: 30000
+          max-lifetime: 600000
+          connection-timeout: 30000
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.example.securityr.model
+  mapper-locations: classpath*:mappers/*.xml
