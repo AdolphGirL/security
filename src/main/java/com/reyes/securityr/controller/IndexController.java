@@ -11,6 +11,7 @@ public class IndexController {
 		return "Welcome to SecurityR!";
 	}
 
+	/**
 	@GetMapping("/register")
 	public String register() {
 		return "註冊畫面";
@@ -34,5 +35,8 @@ public class IndexController {
 	@GetMapping("/members")
 	public String members() {
 		return "使用者列表";
-	}
+	}**/
+	
+	
+	
 }
