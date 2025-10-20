@@ -23,25 +23,5 @@ public class MemberController {
 		this.memberService = memberService;
 	}
 
-	@GetMapping
-	public List<Member> getAllMembers() {
-		return memberService.getAllMembers();
-	}
-
-	@GetMapping("/{id}")
-	public Member getMember(@PathVariable String id) {
-		return memberService.getMember(id);
-	}
-
-	@PostMapping
-	public String addMember(@RequestBody Member member) {
-		memberService.addMember(member);
-		return "Member added successfully";
-	}
-
-	@DeleteMapping("/{id}")
-	public String deleteMember(@PathVariable String id) {
-		memberService.deleteMember(id);
-		return "Member deleted successfully";
-	}
+	
 }

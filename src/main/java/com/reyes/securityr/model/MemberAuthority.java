@@ -5,12 +5,11 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class Member {
+public class MemberAuthority {
 
 	private Long id;
-	private String username;
-	private String password;
-	private Boolean enabled;
+	private Long memberId;
+	private String authority;
 	private Date createdAt;
 
 }

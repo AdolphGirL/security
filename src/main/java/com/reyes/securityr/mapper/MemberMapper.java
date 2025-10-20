@@ -5,30 +5,40 @@ import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.reyes.securityr.model.Member;
 
 @Mapper
 public interface MemberMapper {
 
-	@Select("SELECT id, username, password, authorities FROM member")
-	@Results({ @Result(property = "id", column = "id"), @Result(property = "username", column = "username"),
-			@Result(property = "password", column = "password"),
-			@Result(property = "authorities", column = "authorities", javaType = List.class, typeHandler = org.apache.ibatis.type.ArrayTypeHandler.class) })
-	List<Member> findAll();
+	@Insert("""
+			    INSERT INTO member (username, password, enabled, created_at)
+			    VALUES (#{username}, #{password}, #{enabled}, GETDATE())
+			""")
+	@Options(useGeneratedKeys = true, keyProperty = "id")
+	int insert(Member member);
 
-	@Select("SELECT id, username, password, authorities FROM member WHERE id = #{id}")
-	@Results({ @Result(property = "id", column = "id"), @Result(property = "username", column = "username"),
-			@Result(property = "password", column = "password"),
-			@Result(property = "authorities", column = "authorities", javaType = List.class, typeHandler = org.apache.ibatis.type.ArrayTypeHandler.class) })
-	Member findById(String id);
-
-	@Insert("INSERT INTO member (id, username, password, authorities) VALUES (#{id}, #{username}, #{password}, #{authorities, typeHandler=org.apache.ibatis.type.ArrayTypeHandler})")
-	void insert(Member member);
+	@Update("""
+			    UPDATE member
+			    SET username = #{username},
+			        password = #{password},
+			        enabled = #{enabled}
+			    WHERE id = #{id}
+			""")
+	int update(Member member);
 
 	@Delete("DELETE FROM member WHERE id = #{id}")
-	void delete(String id);
+	int delete(Long id);
+
+	@Select("SELECT * FROM member WHERE id = #{id}")
+	Member findById(Long id);
+
+	@Select("SELECT * FROM member WHERE username = #{username}")
+	Member findByUsername(String username);
+
+	@Select("SELECT * FROM member")
+	List<Member> findAll();
 }
