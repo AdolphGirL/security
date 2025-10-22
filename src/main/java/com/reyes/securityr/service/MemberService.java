@@ -10,5 +10,21 @@ import com.reyes.securityr.model.Member;
 
 @Service
 public class MemberService {
+	
+	private final MemberMapper memberMapper;
 
+	public MemberService(MemberMapper memberMapper) {
+		this.memberMapper = memberMapper;
+	}
+
+	@Transactional(readOnly = true)
+	public List<Member> findAll() {
+		return memberMapper.findAll();
+	}
+	
+	@Transactional
+	public int insert(Member member) {
+		return memberMapper.insert(member);
+	}
+	
 }

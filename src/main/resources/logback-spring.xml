@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<contextName>securityr</contextName>
+	
+	<property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - occur at %L - %msg %n"/>
+	<property name="pattern-color" value="%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%thread] %highlight(%-5level) %green(%logger{50}) - %highlight(%msg) %n"/>
+	<property name="LOG_HOME" value="logs"/>
+	
+	<conversionRule conversionWord="msg" converterClass="com.reyes.securityr.utils.xss.CustomLogParse" />
+	
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="CONSOLE-WITH-COLOR" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>${pattern-color}</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- error warn info 都寫在一起 -->
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/all.%d.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="SQLFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/sqlfile.%d.%i.log</fileNamePattern>
+			<maxFileSize>10MB</maxFileSize>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- 異步輸出 -->
+	<!-- 
+		discardingThreshold 數字等於多少，就表示容量還剩多少時，就丟棄TRACE、DEBUG、INFO的LOG；
+		queueSize/5默認，可以設為0。滿了再說
+		queueSize，促列size，一旦寫入的數量太怪，而queueSize跟不上，就會溢出，256 default
+		appender-ref，具體轉發後，執行的append，一個只能配一個
+	-->
+	<appender name="ASYNC_INFO" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>256</queueSize>
+		<appender-ref ref="FILE"/>
+	</appender>
+	
+	<appender name="ASYNC_SQL_INFO" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>256</queueSize>
+		<appender-ref ref="SQLFILE"/>
+	</appender>
+	
+	<!-- 配置應用程式，處理mybatis sql -->
+	<logger name="com.reyes.securityr.mapper" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE-WITH-COLOR"/>
+		<appender-ref ref="ASYNC_SQL_INFO"/>
+	</logger>
+	
+	<!-- 啟用的基礎配置  -->
+	<root level="INFO">
+		<appender-ref ref="CONSOLE-WITH-COLOR"/>
+		<appender-ref ref="FILE"/>
+	</root>
+</configuration>

@@ -1,16 +1,29 @@
 server:
   servlet:
     context-path: /api
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
   port: 8080
-
 spring:
   application:
     name: SecurityR
+  threads:
+    virtual:
+      enabled: true
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML
+    enabled: true
   datasource:
-      url: jdbc:postgresql://localhost:5432/mybatis_demo
-      username: postgres
-      password: postgres
-      driver-class-name: org.postgresql.Driver
+      url: jdbc:sqlserver://172.16.32.181:1433;databasename=R;encrypt=true;trustServerCertificate=true
+      username: R
+      password: R
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
       type: com.zaxxer.hikari.HikariDataSource
       hikari:
           pool-name: MyBatisHikariCP
@@ -22,5 +35,5 @@ spring:
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
-  type-aliases-package: com.example.securityr.model
+  type-aliases-package: com.reyes.securityr.model
   mapper-locations: classpath*:mappers/*.xml
