@@ -3,12 +3,13 @@ package com.reyes.securityr.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.reyes.securityr.components.CustomAuthenticationSuccessHandler;
 
 /**
  * Security configuration class for the application. This class is currently
@@ -51,21 +52,56 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity
-				.formLogin(Customizer.withDefaults())
 				/** Disable CSRF protection for simplicity in this example */
 				.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(request -> 
-					request
+				.authorizeHttpRequests(auth -> 
+					auth
 						/** Permit all users to create new members */
 						.requestMatchers(HttpMethod.POST, "/members").permitAll()
+						
+						/**
 						.requestMatchers(HttpMethod.GET, "/members").hasAuthority("ADMIN")
 						.requestMatchers(HttpMethod.GET, "/selected-courses").hasAuthority("STUDENT")
-						.requestMatchers(HttpMethod.GET, "/course-feedback").hasAnyAuthority("TEACHER", "ADMIN")
+						.requestMatchers(HttpMethod.GET, "/course-feedback").hasAnyAuthority("TEACHER", "ADMIN")***/
+						
+						.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+						.requestMatchers("/login").permitAll()
+						
 						/** All other requests require authentication */
 						.anyRequest().authenticated()
 				)
+				/** 取消預設
+				.formLogin(Customizer.withDefaults())**/
+				/** failureForwardUrl() 使用 forward，不是 redirect **/
+				.formLogin(form -> 
+					/**
+					form
+						.loginPage("/login")
+						.loginProcessingUrl("/perform_login")
+						.defaultSuccessUrl("/index", true)
+						.failureUrl("/login-error")
+						.permitAll()**/
+					
+					/** 使用自訂的 success handler **/
+					form.loginPage("/login")
+						.loginProcessingUrl("/perform_login")
+						.successHandler(successHandler)
+						.failureUrl("/login-error")
+						.permitAll()
+				).logout(logout -> 
+					logout.logoutUrl("/perform_logout")
+						.logoutSuccessUrl("/logout-success")
+						.deleteCookies("JSESSIONID")
+				)
 				.build();
 	}
+	
+	private final CustomAuthenticationSuccessHandler successHandler;
+
+	public SecurityConfig(CustomAuthenticationSuccessHandler successHandler) {
+		this.successHandler = successHandler;
+	}
+	
 	
 	@Bean
 	PasswordEncoder passwordEncoder() {

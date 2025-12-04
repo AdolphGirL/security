@@ -44,7 +44,7 @@ public class MemberController {
 		
 		String[] roles = { "ADMIN", "TEACHER", "STUDENT" };
 		String randomRole = roles[new java.util.Random().nextInt(roles.length)];
-		authority.setAuthority("ADMIN");
+		authority.setAuthority(randomRole);
 		authority.setCreatedAt(new java.util.Date());
 		
 		this.memberAuthorityService.insert(authority);
